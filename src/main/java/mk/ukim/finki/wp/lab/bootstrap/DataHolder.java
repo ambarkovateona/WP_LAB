@@ -3,11 +3,14 @@ package mk.ukim.finki.wp.lab.bootstrap;
 import jakarta.annotation.PostConstruct;
 import mk.ukim.finki.wp.lab.model.Book;
 import mk.ukim.finki.wp.lab.model.BookReservation;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.core.Ordered;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 public class DataHolder {
     public static List<Book> books = new ArrayList<>();

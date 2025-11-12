@@ -7,22 +7,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mk.ukim.finki.wp.lab.model.BookReservation;
 import mk.ukim.finki.wp.lab.service.BookReservationService;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-
-@WebServlet(name="BookReservationServlet",urlPatterns = "/bookReservation")
+@WebServlet(name = "BookReservationServlet", urlPatterns = "/servlet/bookReservation")
 public class BookReservationServlet extends HttpServlet {
-
+    private final SpringTemplateEngine templateEngine;
     private final BookReservationService bookReservationService;
-    private final TemplateEngine templateEngine;
-    public BookReservationServlet(BookReservationService bookReservationService, TemplateEngine templateEngine) {
-        this.bookReservationService = bookReservationService;
+
+    private static final int MAX_RECENTLY_VIEWED = 3;
+
+    public BookReservationServlet(SpringTemplateEngine templateEngine, BookReservationService bookReservationService) {
         this.templateEngine = templateEngine;
+        this.bookReservationService = bookReservationService;
     }
 
     @Override
@@ -57,7 +60,16 @@ public class BookReservationServlet extends HttpServlet {
         String params = String.format("bookTitle=%s&readerName=%s&readerAddress=%s&numberOfCopies=%s",
                 bookReservation.getBookTitle(), bookReservation.getReaderName(), bookReservation.getReaderAddress(), bookReservation.getNumberOfCopies());
 
-
+        List<String> lastViewed = new ArrayList<>();
+        Object lastViewedSessionObject = request.getSession().getAttribute("lastViewed");
+        if(lastViewedSessionObject != null) {
+            lastViewed = (List<String>) lastViewedSessionObject;
+            if(lastViewed.size() >= MAX_RECENTLY_VIEWED) {
+                lastViewed.removeLast();
+            }
+        }
+        lastViewed.addFirst(bookReservation.getBookTitle());
+        request.getSession().setAttribute("lastViewed", lastViewed);
 
         response.sendRedirect("/bookReservation?" + params);
     }

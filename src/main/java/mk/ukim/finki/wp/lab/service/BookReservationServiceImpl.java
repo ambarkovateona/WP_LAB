@@ -14,9 +14,6 @@ public class BookReservationServiceImpl implements BookReservationService{
 
     @Override
     public BookReservation placeReservation(String bookTitle, String readerName, String readerAddress, int numberOfCopies) {
-      if(bookTitle==null || bookTitle.isEmpty() || readerName==null || readerName.isEmpty() || readerAddress==null || readerAddress.isEmpty()) {
-          throw new IllegalArgumentException("Invalid input");
-      }
 
       BookReservation res=new BookReservation(bookTitle,(long)numberOfCopies,readerAddress,readerName);
        return bookReservationRepository.save(res);
